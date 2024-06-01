@@ -24,8 +24,8 @@
          </el-form-item>
 
         <el-form-item  label="AI审核建议:">
-            <span v-if="this.ai_result===false||this.ai_result===0">通过</span>
-            <span v-if="this.ai_result===true||this.ai_result===1">不通过</span>
+            <span v-if="this.ai_result===0">通过</span>
+            <span v-if="this.ai_result===1">不通过</span>
         </el-form-item>
 
         <el-form-item  label="AI审核理由:" v-if="this.ai_reason!==''">
@@ -140,7 +140,7 @@ export default{
             is_blocked:false,
             review_reason:""
         },
-        ai_result:false,
+        ai_result:0,
         ai_reason:"",
     }),
     methods:{
@@ -179,7 +179,7 @@ export default{
         },
         AiCheck(comment_content){
 
-            axios.post("/api/v1/aiService/check/"+comment_content)
+            axios.get("http://8.130.78.60:18088/api/v1/aiService/check/"+comment_content)
                 .then((res)=> {
                     ElMessage.success('AI审核成功');
                     this.ai_result=res.data.data.result;
