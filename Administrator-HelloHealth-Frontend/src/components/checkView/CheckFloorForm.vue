@@ -23,6 +23,15 @@
             <FancyButton @click="openContent">点击查看内容详情</FancyButton>
          </el-form-item>
 
+        <el-form-item  label="AI审核建议:">
+            <span v-if="this.ai_result===false||this.ai_result===0">通过</span>
+            <span v-if="this.ai_result===true||this.ai_result===1">不通过</span>
+        </el-form-item>
+
+        <el-form-item  label="AI审核理由:" v-if="this.ai_reason!==''">
+            {{this.ai_reason}}
+        </el-form-item>
+
          <el-form-item v-if="!is_checked" label="是否通过:">
                 <el-radio-group v-model="check_info.is_passed">
                     <el-radio :label="true">是</el-radio>
@@ -32,8 +41,8 @@
         </el-form-item>
 
         <el-form-item v-if="is_checked" label="是否通过:">
-            <span v-if="comment_info.review_status==1">通过</span>
-            <span v-if="comment_info.review_status==0">不通过</span>
+            <span v-if="comment_info.review_status===1">通过</span>
+            <span v-if="comment_info.review_status===0">不通过</span>
         </el-form-item>
 
         <el-form-item v-if="!is_checked &&!check_info.is_passed" label="是否封禁用户:">
@@ -131,6 +140,8 @@ export default{
             is_blocked:false,
             review_reason:""
         },
+        ai_result:false,
+        ai_reason:"",
     }),
     methods:{
         submit(){
@@ -165,14 +176,30 @@ export default{
             console.log("opencontent")
             this.$emit('openContent');
              
-        }
+        },
+        AiCheck(comment_content){
+
+            axios.post("/api/v1/aiService/check/"+comment_content)
+                .then((res)=> {
+                    ElMessage.success('AI审核成功');
+                    this.ai_result=res.data.data.result;
+                    this.ai_reason=res.data.message;
+                })
+                .catch(error => {
+                    ElMessage.error('AI审核失败');
+                    console.log(error)
+                    if(error.network) return;
+                    error.defaultHandler("AI审核出错")
+                })
+        },
     },
     created()
     {
         this.check_info.comment_id=this.comment_info.comment_id;
         this.check_info.author_id=this.comment_info.author_id;
-        console.log(this.check_info.comment_id)
-    }
+        console.log(this.check_info.comment_id);
+        this. AiCheck(this.comment_info.content);
+    },
 
 
 }

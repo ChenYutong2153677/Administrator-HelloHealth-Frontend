@@ -109,6 +109,7 @@ import CheckFloorForm from "../components/checkView/CheckFloorForm.vue"
 import UserInfoCardSmall from "@/components/UserInfoCardSmall.vue";
 import FancyButton from "@/components/FancyButton.vue";
 import TipTapEditorReadonly from "@/components/postView/TipTapEditorReadonly.vue";
+import {ElMessage} from "element-plus";
 export default{
 
     components:
@@ -124,7 +125,7 @@ export default{
         comment_list:[],
         checkDialogVisible:false,
         detailContentVisible:false,
-        selected_comment: undefined
+        selected_comment: undefined,
     }),
     methods:
     {
@@ -133,7 +134,7 @@ export default{
             .then((res)=> {
                 comment_info.post_id=res.data.data.post_id; 
                 comment_info.floor_number=res.data.data.floor_number; 
-                comment_info.content=res.data.data.content;    
+                comment_info.content=res.data.data.content;
                 this.selected_comment = comment_info;
                 this.checkDialogVisible = true
             })
@@ -141,12 +142,10 @@ export default{
                 if(error.network) return;
                 error.defaultHandler("获取审核信息出错")
             })
-
-           
         },
- 
+
         sortSwitcher(res){
-            if(res.paneName==this.type_sort.type){
+            if(res.paneName===this.type_sort.type){
                 return;
             }
             this.type_sort.type=res.paneName;
